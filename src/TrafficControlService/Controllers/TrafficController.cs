@@ -12,99 +12,116 @@ the top of this file. If you comment the #define USE_ACTORMODEL statement, the b
 implementation is used. Uncomment this statement to use the Actormodel implementation.
 */
 
-namespace TrafficControlService.Controllers;
+using System;
+using System.Threading.Tasks;
+using Dapr.Client;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Logging;
+using TrafficControlService.Actors;
+using TrafficControlService.Events;
+using TrafficControlService.DomainServices;
+using TrafficControlService.Models;
+using TrafficControlService.Repositories;
+using Dapr.Actors;
+using Dapr.Actors.Client;
 
-[ApiController]
-[Route("")]
-public class TrafficController : ControllerBase
+namespace TrafficControlService.Controllers
 {
-    private readonly ILogger<TrafficController> _logger;
-    private readonly IVehicleStateRepository _vehicleStateRepository;
-    private readonly ISpeedingViolationCalculator _speedingViolationCalculator;
-    private readonly string _roadId;
-
-    public TrafficController(
-        ILogger<TrafficController> logger,
-        IVehicleStateRepository vehicleStateRepository,
-        ISpeedingViolationCalculator speedingViolationCalculator)
+    [ApiController]
+    [Route("")]
+    public class TrafficController : ControllerBase
     {
-        _logger = logger;
-        _vehicleStateRepository = vehicleStateRepository;
-        _speedingViolationCalculator = speedingViolationCalculator;
-        _roadId = speedingViolationCalculator.GetRoadId();
-    }
+        private readonly ILogger<TrafficController> _logger;
+        private readonly IVehicleStateRepository _vehicleStateRepository;
+        private readonly ISpeedingViolationCalculator _speedingViolationCalculator;
+        private readonly string _roadId;
+
+        public TrafficController(
+            ILogger<TrafficController> logger,
+            IVehicleStateRepository vehicleStateRepository,
+            ISpeedingViolationCalculator speedingViolationCalculator)
+        {
+            _logger = logger;
+            _vehicleStateRepository = vehicleStateRepository;
+            _speedingViolationCalculator = speedingViolationCalculator;
+            _roadId = speedingViolationCalculator.GetRoadId();
+        }
 
 #if !USE_ACTORMODEL
 
-    [HttpPost("entrycam")]
-    public async Task<ActionResult> VehicleEntryAsync(VehicleRegistered msg)
-    {
-        try
+        [HttpPost("entrycam")]
+        public async Task<ActionResult> VehicleEntryAsync(VehicleRegistered msg)
         {
-            // log entry
-            _logger.LogInformation($"ENTRY detected in lane {msg.Lane} at {msg.Timestamp.ToString("hh:mm:ss")} " +
-                $"of vehicle with license-number {msg.LicenseNumber}.");
-
-            // store vehicle state
-            var vehicleState = new VehicleState(msg.LicenseNumber, msg.Timestamp, null);
-            await _vehicleStateRepository.SaveVehicleStateAsync(vehicleState);
-
-            return Ok();
-        }
-        catch (Exception ex)
-        {
-            _logger.LogError(ex, "Error occurred while processing ENTRY");
-            return StatusCode(500);
-        }
-    }
-
-    [HttpPost("exitcam")]
-    public async Task<ActionResult> VehicleExitAsync(VehicleRegistered msg, [FromServices] DaprClient daprClient)
-    {
-        try
-        {
-            // get vehicle state
-            var state = await _vehicleStateRepository.GetVehicleStateAsync(msg.LicenseNumber);
-            if (state == default(VehicleState))
+            try
             {
-                return NotFound();
-            }
+                // log entry
+                _logger.LogInformation($"ENTRY detected in lane {msg.Lane} at {msg.Timestamp.ToString("hh:mm:ss")} " +
+                    $"of vehicle with license-number {msg.LicenseNumber}.");
 
-            // log exit
-            _logger.LogInformation($"EXIT detected in lane {msg.Lane} at {msg.Timestamp.ToString("hh:mm:ss")} " +
-                $"of vehicle with license-number {msg.LicenseNumber}.");
-
-            // update state
-            var exitState = state.Value with { ExitTimestamp = msg.Timestamp };
-            await _vehicleStateRepository.SaveVehicleStateAsync(exitState);
-
-            // handle possible speeding violation
-            int violation = _speedingViolationCalculator.DetermineSpeedingViolationInKmh(exitState.EntryTimestamp, exitState.ExitTimestamp.Value);
-            if (violation > 0)
-            {
-                _logger.LogInformation($"Speeding violation detected ({violation} KMh) of vehicle" +
-                    $"with license-number {state.Value.LicenseNumber}.");
-
-                var speedingViolation = new SpeedingViolation
+                // store vehicle state
+                var vehicleState = new VehicleState
                 {
-                    VehicleId = msg.LicenseNumber,
-                    RoadId = _roadId,
-                    ViolationInKmh = violation,
-                    Timestamp = msg.Timestamp
+                    LicenseNumber = msg.LicenseNumber,
+                    EntryTimestamp = msg.Timestamp
                 };
+                await _vehicleStateRepository.SaveVehicleStateAsync(vehicleState);
 
-                // publish speedingviolation (Dapr publish / subscribe)
-                await daprClient.PublishEventAsync("pubsub", "speedingviolations", speedingViolation);
+                return Ok();
             }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error occurred while processing ENTRY");
+                return StatusCode(500);
+            }
+        }
 
-            return Ok();
-        }
-        catch (Exception ex)
+        [HttpPost("exitcam")]
+        public async Task<ActionResult> VehicleExitAsync(VehicleRegistered msg, [FromServices] DaprClient daprClient)
         {
-            _logger.LogError(ex, "Error occurred while processing EXIT");
-            return StatusCode(500);
+            try
+            {
+                // get vehicle state
+                var state = await _vehicleStateRepository.GetVehicleStateAsync(msg.LicenseNumber);
+                if (state == null)
+                {
+                    return NotFound();
+                }
+
+                // log exit
+                _logger.LogInformation($"EXIT detected in lane {msg.Lane} at {msg.Timestamp.ToString("hh:mm:ss")} " +
+                    $"of vehicle with license-number {msg.LicenseNumber}.");
+
+                // update state
+                state.ExitTimestamp = msg.Timestamp;
+                await _vehicleStateRepository.SaveVehicleStateAsync(state);
+
+                // handle possible speeding violation
+                int violation = _speedingViolationCalculator.DetermineSpeedingViolationInKmh(state.EntryTimestamp, state.ExitTimestamp);
+                if (violation > 0)
+                {
+                    _logger.LogInformation($"Speeding violation detected ({violation} KMh) of vehicle" +
+                        $"with license-number {state.LicenseNumber}.");
+
+                    var speedingViolation = new SpeedingViolation
+                    {
+                        VehicleId = msg.LicenseNumber,
+                        RoadId = _roadId,
+                        ViolationInKmh = violation,
+                        Timestamp = msg.Timestamp
+                    };
+
+                    //publish speedingviolation (Dapr publish / subscribe)
+                    await daprClient.PublishEventAsync("pubsub", "speedingviolations", speedingViolation);
+                }
+
+                return Ok();
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error occurred while processing EXIT");
+                return StatusCode(500);
+            }
         }
-    }
 
 #else
 
@@ -142,4 +159,5 @@ public class TrafficController : ControllerBase
 
 #endif
 
+    }
 }

@@ -1,7 +1,11 @@
-namespace TrafficControlService.Repositories;
+using System.Threading.Tasks;
+using TrafficControlService.Models;
 
-public interface IVehicleStateRepository
+namespace TrafficControlService.Repositories
 {
-    Task SaveVehicleStateAsync(VehicleState vehicleState);
-    Task<VehicleState?> GetVehicleStateAsync(string licenseNumber);
+    public interface IVehicleStateRepository
+    {
+         Task SaveVehicleStateAsync(VehicleState vehicleState);
+         Task<VehicleState> GetVehicleStateAsync(string licenseNumber);
+    }
 }

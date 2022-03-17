@@ -1,25 +1,33 @@
-namespace TrafficControlService.Repositories;
+using System.Threading.Tasks;
+using Dapr.Client;
+using TrafficControlService.Models;
 
-public class DaprVehicleStateRepository : IVehicleStateRepository
+namespace TrafficControlService.Repositories
 {
-    private const string DAPR_STORE_NAME = "statestore";
-    private readonly DaprClient _daprClient;
-
-    public DaprVehicleStateRepository(DaprClient daprClient)
+    public class DaprVehicleStateRepository : IVehicleStateRepository
     {
-        _daprClient = daprClient;
-    }
+        private const string DAPR_STORE_NAME = "statestore";
+        private readonly DaprClient _daprClient;
 
-    public async Task SaveVehicleStateAsync(VehicleState vehicleState)
-    {
-        await _daprClient.SaveStateAsync<VehicleState>(
-            DAPR_STORE_NAME, vehicleState.LicenseNumber, vehicleState);
-    }
+        public DaprVehicleStateRepository(DaprClient daprClient)
+        {
+            _daprClient = daprClient;
+        }
 
-    public async Task<VehicleState?> GetVehicleStateAsync(string licenseNumber)
-    {
-        var stateEntry = await _daprClient.GetStateEntryAsync<VehicleState>(
-            DAPR_STORE_NAME, licenseNumber);
-        return stateEntry.Value;
+        public async Task SaveVehicleStateAsync(VehicleState vehicleState)
+        {
+            await _daprClient.SaveStateAsync<VehicleState>(
+                DAPR_STORE_NAME, vehicleState.LicenseNumber, vehicleState, new StateOptions()
+                {
+                    Concurrency = ConcurrencyMode.LastWrite,
+                    Consistency = ConsistencyMode.Eventual
+                });
+        }
+
+        public async Task<VehicleState> GetVehicleStateAsync(string licenseNumber)
+        {
+            return await _daprClient.GetStateAsync<VehicleState>(
+                DAPR_STORE_NAME, licenseNumber);
+        }
     }
 }

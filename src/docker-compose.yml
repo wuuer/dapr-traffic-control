@@ -1,0 +1,182 @@
+version: '3.4'
+
+services:
+
+  mosquitto:
+    build:
+     context: .
+     dockerfile: Infrastructure/mosquitto/Dockerfile
+    ports:
+      - 6009:1883
+    networks:
+      - "traffic_control"
+
+  redis:
+    image: "redis:latest"
+    networks:
+      - "traffic_control"
+
+  rabbitmq:
+    image: "rabbitmq:management"
+    ports:
+      - 15672:15672
+      - 5672:5672
+    networks:
+      - "traffic_control"
+
+  zipkin:
+    image: "openzipkin/zipkin"
+    ports:
+      - 9411:9411
+      - 32411:32411
+    networks:
+      - "traffic_control"
+
+  prometheus:
+     image: "prom/prometheus"
+     command: [
+     "--config.file=/etc/prometheus/prometheus.yml",
+     "--web.listen-address=:8090"
+     ]
+     ports:
+       - 8090:8090
+     volumes:
+       - "./Observability/prometheus/prometheus.yml:/etc/prometheus/prometheus.yml"
+     networks:
+      - "traffic_control"
+   
+  grafana:
+     image: "grafana/grafana-oss"
+     ports:
+       - 3005:3000
+     networks:
+      - "traffic_control"
+
+
+  maildev:
+     image: "maildev/maildev"
+     networks:
+      - "traffic_control"
+
+
+  trafficcontrolservice:
+    image: ${DOCKER_REGISTRY-}trafficcontrolservice
+    environment:
+      DAPR_HTTP_PORT: 3600
+      DAPR_GRPC_PORT: 6100
+    build:
+      context: .
+      dockerfile: TrafficControlService/Dockerfile
+    ports:
+      - 6001:6001
+    networks:
+      - "traffic_control"
+
+
+  trafficcontrolservice-dapr:
+    image: "daprio/daprd:edge"
+    command: [
+    "./daprd",
+    "-app-id", "trafficcontrolservice",
+    "-app-port", "6001", 
+    "--dapr-http-port", "3600",
+    "--metrics-port","9090",
+    "--dapr-grpc-port","6100",
+    "--placement-host-address", "placement:50006",
+    "--components-path", "/components",
+    "--config", "/config/config.yaml",
+    "--log-level","info"
+    ]
+    volumes:
+       - "./dapr/components:/components"
+       - "./dapr/config:/config"
+    depends_on:
+      - trafficcontrolservice
+      - mosquitto
+    network_mode: "service:trafficcontrolservice"
+
+  vehicleregistrationservice:
+    image: ${DOCKER_REGISTRY-}vehicleregistrationservice
+    environment:
+      DAPR_HTTP_PORT: 3602
+      DAPR_GRPC_PORT: 6102
+    build:
+      context: .
+      dockerfile: VehicleRegistrationService/Dockerfile
+    ports:
+      - 6003:6003
+    networks:
+      - "traffic_control"
+
+  vehicleregistrationservice-dapr:
+    image: "daprio/daprd:edge"
+    command: [
+    "./daprd",
+    "-app-id", "vehicleregistrationservice",
+    "-app-port", "6003", 
+    "--dapr-http-port", "3602",
+    "--metrics-port","9090",
+    "--dapr-grpc-port","6102",
+    "--placement-host-address", "placement:50006",
+    "--components-path", "/components",
+    "--config", "/config/config.yaml",
+    "--log-level","info"
+    ]
+    volumes:
+       - "./dapr/components:/components"
+       - "./dapr/config:/config"
+    depends_on:
+      - vehicleregistrationservice
+    network_mode: "service:vehicleregistrationservice"
+
+
+  finecollectionservice:
+    image: ${DOCKER_REGISTRY-}finecollectionservice
+    environment:
+      DAPR_HTTP_PORT: 3601
+      DAPR_GRPC_PORT: 6101
+      DOTNET_RUNNING_IN_CONTAINER: "false"
+    build:
+      context: .
+      dockerfile: FineCollectionService/Dockerfile
+    ports:
+      - 6002:6002
+    networks:
+      - "traffic_control"
+
+  finecollectionservice-dapr:
+    image: "daprio/daprd:edge"
+    command: [
+    "./daprd",
+    "-app-id", "finecollectionservice",
+    "-app-port", "6002", 
+    "--dapr-http-port", "3601",
+    "--metrics-port","9090",
+    "--dapr-grpc-port","6101",
+    "--placement-host-address", "placement:50006",
+    "--components-path", "/components",
+    "--config", "/config/config.yaml",
+    "--log-level","info"
+    ]
+    volumes:
+       - "./dapr/components:/components"
+       - "./dapr/config:/config"
+    depends_on:
+      - finecollectionservice
+    network_mode: "service:finecollectionservice"
+
+
+
+
+
+
+  placement:
+    image: "daprio/dapr:edge"
+    command: ["./placement", "-port", "50006"]
+    networks:
+      - "traffic_control"
+
+networks:
+  traffic_control:
+    driver: bridge
+

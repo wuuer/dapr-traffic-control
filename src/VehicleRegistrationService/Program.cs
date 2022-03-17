@@ -1,27 +1,28 @@
-// create web-app
-var builder = WebApplication.CreateBuilder(args);
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
+using Microsoft.AspNetCore.Hosting;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Logging;
 
-builder.Services.AddScoped<IVehicleInfoRepository, InMemoryVehicleInfoRepository>();
-
-var daprHttpPort = Environment.GetEnvironmentVariable("DAPR_HTTP_PORT") ?? "3602";
-var daprGrpcPort = Environment.GetEnvironmentVariable("DAPR_GRPC_PORT") ?? "60002";
-builder.Services.AddDaprClient(builder => builder
-    .UseHttpEndpoint($"http://localhost:{daprHttpPort}")
-    .UseGrpcEndpoint($"http://localhost:{daprGrpcPort}"));
-
-builder.Services.AddControllers().AddDapr();
-
-var app = builder.Build();
-
-// configure web-app
-if (app.Environment.IsDevelopment())
+namespace VehicleRegistrationService
 {
-    app.UseDeveloperExceptionPage();
+    public class Program
+    {
+        public static void Main(string[] args)
+        {
+            CreateHostBuilder(args).Build().Run();
+        }
+
+        public static IHostBuilder CreateHostBuilder(string[] args) =>
+            Host.CreateDefaultBuilder(args)
+                .ConfigureWebHostDefaults(webBuilder =>
+                {
+                    webBuilder
+                        .UseUrls("http://localhost:6003")
+                        .UseStartup<Startup>();
+                });
+    }
 }
-app.UseCloudEvents();
-
-// configure routing
-app.MapControllers();
-
-// let's go!
-app.Run("http://localhost:6002");

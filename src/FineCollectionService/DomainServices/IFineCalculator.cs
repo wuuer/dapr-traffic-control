@@ -1,6 +1,7 @@
-namespace FineCollectionService.DomainServices;
-
-public interface IFineCalculator
+namespace FineCollectionService.DomainServices
 {
-    public int CalculateFine(string licenseKey, int violationInKmh);
+    public interface IFineCalculator
+    {
+        public int CalculateFine(string licenseKey, int violationInKmh);
+    }
 }

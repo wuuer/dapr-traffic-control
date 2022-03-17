@@ -1,16 +1,25 @@
-namespace FineCollectionService.Proxies;
+using System.Net.Http;
+using System.Net.Http.Json;
+using System.Threading.Tasks;
+using Dapr.Client;
+using FineCollectionService.Models;
 
-public class VehicleRegistrationService
+namespace FineCollectionService.Proxies
 {
-    private HttpClient _httpClient;
-    public VehicleRegistrationService(HttpClient httpClient)
+    public class VehicleRegistrationService
     {
-        _httpClient = httpClient;
-    }
+        private HttpClient _httpClient;
+        public VehicleRegistrationService(HttpClient httpClient)
+        {
+            _httpClient = httpClient;
+        }
 
-    public async Task<VehicleInfo> GetVehicleInfo(string licenseNumber)
-    {
-        return await _httpClient.GetFromJsonAsync<VehicleInfo>(
-            $"vehicleinfo/{licenseNumber}");
+        public async Task<VehicleInfo> GetVehicleInfo(string licenseNumber)
+        {
+            return await _httpClient.GetFromJsonAsync<VehicleInfo>(
+                $"vehicleinfo/{licenseNumber}");
+
+
+        }
     }
 }

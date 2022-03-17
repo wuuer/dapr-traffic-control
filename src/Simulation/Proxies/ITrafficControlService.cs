@@ -1,7 +1,11 @@
-namespace Simulation.Proxies;
+using System.Threading.Tasks;
+using Simulation.Events;
 
-public interface ITrafficControlService
+namespace Simulation.Proxies
 {
-    public Task SendVehicleEntryAsync(VehicleRegistered vehicleRegistered);
-    public Task SendVehicleExitAsync(VehicleRegistered vehicleRegistered);
+    public interface ITrafficControlService
+    {
+        public Task SendVehicleEntryAsync(VehicleRegistered vehicleRegistered);
+        public Task SendVehicleExitAsync(VehicleRegistered vehicleRegistered);
+    }
 }

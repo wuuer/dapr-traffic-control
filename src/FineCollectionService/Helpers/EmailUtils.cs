@@ -1,13 +1,16 @@
-namespace FineCollectionService.Helpers;
+using System;
+using FineCollectionService.Models;
 
-public class EmailUtils
+namespace FineCollectionService.Helpers
 {
-    public static string CreateEmailBody(
-        SpeedingViolation speedingViolation,
-        VehicleInfo vehicleInfo,
-        string fine)
+    public class EmailUtils
     {
-        return $@"
+        public static string CreateEmailBody(
+            SpeedingViolation speedingViolation, 
+            VehicleInfo vehicleInfo, 
+            string fine)
+        {
+            return $@"
                 <html>
                     <head>
                         <style>
@@ -133,5 +136,6 @@ public class EmailUtils
                     </body>
                 </html>
             ";
+        }        
     }
 }

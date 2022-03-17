@@ -8,7 +8,7 @@ spec:
   version: v1
   metadata:
   - name: url
-    value: mqtt://localhost:1883
+    value: tcp://mosquitto:1883
   - name: topic
     value: trafficcontrol/exitcam
   - name: consumerID

@@ -1,15 +1,11 @@
-namespace TrafficControlService.Models;
+using System;
 
-public record struct VehicleState
+namespace TrafficControlService.Models
 {
-    public string LicenseNumber { get; init; }
-    public DateTime EntryTimestamp { get; init; }
-    public DateTime? ExitTimestamp { get; init; }
-
-    public VehicleState(string licenseNumber, DateTime entryTimestamp, DateTime? exitTimestamp = null)
+    public class VehicleState
     {
-        this.LicenseNumber = licenseNumber;
-        this.EntryTimestamp = entryTimestamp;
-        this.ExitTimestamp = exitTimestamp;
+        public string LicenseNumber { get; set; }
+        public DateTime EntryTimestamp { get; set; }
+        public DateTime ExitTimestamp { get; set; }
     }
 }

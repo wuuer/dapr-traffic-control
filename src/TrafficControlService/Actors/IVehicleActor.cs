@@ -1,7 +1,12 @@
-namespace TrafficControlService.Actors;
+using System.Threading.Tasks;
+using Dapr.Actors;
+using TrafficControlService.Events;
 
-public interface IVehicleActor : IActor
+namespace TrafficControlService.Actors
 {
-    public Task RegisterEntryAsync(VehicleRegistered msg);
-    public Task RegisterExitAsync(VehicleRegistered msg);
+    public interface IVehicleActor : IActor
+    {
+        public Task RegisterEntryAsync(VehicleRegistered msg);
+        public Task RegisterExitAsync(VehicleRegistered msg);
+    }
 }

@@ -1,0 +1,71 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.31205.134
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Simulation", "Simulation\Simulation.csproj", "{9D933F37-BCAB-4CDF-AF65-C78893D1E2D9}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "VisualSimulation", "VisualSimulation\VisualSimulation.csproj", "{DC0CD8E4-1A63-4C4A-806D-966B94129E4A}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "VehicleRegistrationService", "VehicleRegistrationService\VehicleRegistrationService.csproj", "{67EE13E1-8368-4757-ABFE-539A38DEF7CF}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TrafficControlService", "TrafficControlService\TrafficControlService.csproj", "{9E526B89-34D4-4A74-8737-B9BA25C49794}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "FineCollectionService", "FineCollectionService\FineCollectionService.csproj", "{0580F129-27C0-4DAF-8365-954F80C674E7}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Infrastructure", "Infrastructure", "{3A9869FE-EE0E-4AAA-B54D-D814FE3704A0}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "mosquitto", "mosquitto", "{834499C1-47E2-47CE-862A-A7A281993BBC}"
+	ProjectSection(SolutionItems) = preProject
+		Infrastructure\mosquitto\Dockerfile = Infrastructure\mosquitto\Dockerfile
+		Infrastructure\mosquitto\mosquitto.conf = Infrastructure\mosquitto\mosquitto.conf
+	EndProjectSection
+EndProject
+Project("{E53339B2-1760-4266-BCC7-CA923CBCF16C}") = "docker-compose", "docker-compose.dcproj", "{90182C04-1E54-4AEE-A9B0-FC26917D3316}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{07F4BFA9-E94C-42E3-845C-600168817089}"
+	ProjectSection(SolutionItems) = preProject
+		DaprDockerfile = DaprDockerfile
+	EndProjectSection
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{9D933F37-BCAB-4CDF-AF65-C78893D1E2D9}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{9D933F37-BCAB-4CDF-AF65-C78893D1E2D9}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{9D933F37-BCAB-4CDF-AF65-C78893D1E2D9}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{9D933F37-BCAB-4CDF-AF65-C78893D1E2D9}.Release|Any CPU.Build.0 = Release|Any CPU
+		{DC0CD8E4-1A63-4C4A-806D-966B94129E4A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{DC0CD8E4-1A63-4C4A-806D-966B94129E4A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{DC0CD8E4-1A63-4C4A-806D-966B94129E4A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{DC0CD8E4-1A63-4C4A-806D-966B94129E4A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{67EE13E1-8368-4757-ABFE-539A38DEF7CF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{67EE13E1-8368-4757-ABFE-539A38DEF7CF}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{67EE13E1-8368-4757-ABFE-539A38DEF7CF}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{67EE13E1-8368-4757-ABFE-539A38DEF7CF}.Release|Any CPU.Build.0 = Release|Any CPU
+		{9E526B89-34D4-4A74-8737-B9BA25C49794}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{9E526B89-34D4-4A74-8737-B9BA25C49794}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{9E526B89-34D4-4A74-8737-B9BA25C49794}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{9E526B89-34D4-4A74-8737-B9BA25C49794}.Release|Any CPU.Build.0 = Release|Any CPU
+		{0580F129-27C0-4DAF-8365-954F80C674E7}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{0580F129-27C0-4DAF-8365-954F80C674E7}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{0580F129-27C0-4DAF-8365-954F80C674E7}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{0580F129-27C0-4DAF-8365-954F80C674E7}.Release|Any CPU.Build.0 = Release|Any CPU
+		{90182C04-1E54-4AEE-A9B0-FC26917D3316}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{90182C04-1E54-4AEE-A9B0-FC26917D3316}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{90182C04-1E54-4AEE-A9B0-FC26917D3316}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{90182C04-1E54-4AEE-A9B0-FC26917D3316}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{834499C1-47E2-47CE-862A-A7A281993BBC} = {3A9869FE-EE0E-4AAA-B54D-D814FE3704A0}
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {EC01B71A-3B5B-45C2-8CDA-E682EC3DCE4C}
+	EndGlobalSection
+EndGlobal

@@ -1,21 +1,21 @@
-FROM mcr.microsoft.com/dotnet/sdk:6.0-bullseye-slim AS build-env
+FROM mcr.microsoft.com/dotnet/sdk:5.0-buster-slim AS build-env
 WORKDIR /app
 
 # Copy necessary files and restore as distinct layer
-COPY FineCollectionService.csproj ./
+COPY FineCollectionService/FineCollectionService.csproj ./
 RUN dotnet restore
 
 # Copy everything else and build
-COPY . ./
+COPY ./FineCollectionService ./
 RUN dotnet publish -c Release -o out FineCollectionService.csproj
 
 # Build runtime image
-FROM mcr.microsoft.com/dotnet/aspnet:6.0-bullseye-slim
+FROM mcr.microsoft.com/dotnet/aspnet:5.0-buster-slim
 COPY --from=build-env /app/out .
 
 # Expose ports
 EXPOSE 6001/tcp
-ENV ASPNETCORE_URLS http://*:6001
+ENV ASPNETCORE_URLS http://*:6002
 
 # Start
 ENTRYPOINT ["dotnet", "FineCollectionService.dll"]
