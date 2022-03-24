@@ -84,8 +84,7 @@ services:
     "--dapr-grpc-port","6100",
     "--placement-host-address", "placement:50006",
     "--components-path", "/components",
-    "--config", "/config/config.yaml",
-    "--log-level","info"
+    "--config", "/config/config.yaml"
     ]
     volumes:
        - "./dapr/components:/components"
@@ -119,8 +118,7 @@ services:
     "--dapr-grpc-port","6102",
     "--placement-host-address", "placement:50006",
     "--components-path", "/components",
-    "--config", "/config/config.yaml",
-    "--log-level","info"
+    "--config", "/config/config.yaml"
     ]
     volumes:
        - "./dapr/components:/components"
@@ -155,8 +153,7 @@ services:
     "--dapr-grpc-port","6101",
     "--placement-host-address", "placement:50006",
     "--components-path", "/components",
-    "--config", "/config/config.yaml",
-    "--log-level","info"
+    "--config", "/config/config.yaml"
     ]
     volumes:
        - "./dapr/components:/components"
