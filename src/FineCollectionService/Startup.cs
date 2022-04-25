@@ -1,4 +1,5 @@
 using System;
+using System.Reflection;
 using Dapr.Client;
 using FineCollectionService.DomainServices;
 using FineCollectionService.Proxies;
@@ -44,6 +45,10 @@ namespace FineCollectionService
             services.AddSingleton<VehicleRegistrationService>(_ =>
                 new VehicleRegistrationService(DaprClient.CreateInvokeHttpClient(
                     "vehicleregistrationservice", $"http://localhost:{daprHttpPort}")));
+
+
+
+
 
             services.AddControllers().AddDapr();
         }

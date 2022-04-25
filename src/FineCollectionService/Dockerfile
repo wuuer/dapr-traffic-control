@@ -1,12 +1,19 @@
 FROM mcr.microsoft.com/dotnet/sdk:5.0-buster-slim AS build-env
-WORKDIR /app
 
+WORKDIR /app/MicroService.DaprClient
 # Copy necessary files and restore as distinct layer
-COPY FineCollectionService/FineCollectionService.csproj ./
+
+COPY ./MicroService.DaprClient ./
 RUN dotnet restore
 
-# Copy everything else and build
+
+WORKDIR /app/FineCollectionService
+
 COPY ./FineCollectionService ./
+RUN dotnet restore
+
+
+# Copy everything else and build
 RUN dotnet publish -c Release -o out FineCollectionService.csproj
 
 # Build runtime image
